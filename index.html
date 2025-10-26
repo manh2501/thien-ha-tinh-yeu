@@ -1,0 +1,196 @@
+<!--
+Project: thien-ha-tinh-yeu (Thiên Hà Tình Yêu)
+Files included below: README.md, index.html, assets/README (notes)
+
+Instructions:
+1. Create a new GitHub repository named `thien-ha-tinh-yeu`.
+2. Copy the contents of the files below into your local project files.
+3. git init -> git add . -> git commit -m "Initial commit" -> git branch -M main
+4. git remote add origin https://github.com/<your-username>/thien-ha-tinh-yeu.git
+5. git push -u origin main
+
+Open index.html in a browser to preview.
+-->
+
+<!-- ===================== README.md ===================== -->
+<!--
+# Thiên Hà Tình Yêu
+
+Một trang web one-page nhẹ nhàng, chủ đề "Thiên Hà Tình Yêu" — nền vũ trụ sao, trái tim lơ lửng, hiệu ứng glow và nhạc nền tùy chọn.
+
+**Bao gồm:**
+- `index.html` — toàn bộ HTML/CSS/JS để dễ dùng (single file)
+- Hướng dẫn sử dụng và cách đẩy lên GitHub (ở phần header comment)
+
+**Tùy biến:**
+- Thay đổi text, màu sắc, nhạc (thêm file MP3 vào thư mục `assets` và cập nhật `audio` src)
+- Thêm trang con, liên hệ, form, v.v.
+
+**Giấy phép:** MIT (tùy bạn)
+-->
+
+<!-- ===================== index.html ===================== -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Thiên Hà Tình Yêu</title>
+  <meta name="description" content="Thiên Hà Tình Yêu — một trang nhỏ dành cho ai đó đặc biệt." />
+  <style>
+    :root{
+      --bg:#05021a; --accent:#ff66b3; --accent-2:#8bd3ff; --glass: rgba(255,255,255,0.06);
+      --font-sans: 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    html,body{height:100%;margin:0;font-family:var(--font-sans);background:var(--bg);color:#fff;overflow:hidden}
+    .wrap{position:relative;height:100vh;width:100vw;display:flex;align-items:center;justify-content:center}
+
+    /* starfield canvas sits under everything */
+    canvas#stars{position:absolute;inset:0;display:block}
+
+    /* Center card */
+    .card{position:relative;z-index:8;max-width:900px;width:88%;padding:36px;border-radius:20px;background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter:blur(6px);box-shadow:0 8px 40px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.04);text-align:center}
+    h1{font-size:clamp(28px,5vw,48px);margin:0 0 8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+    p.lead{margin:0 0 18px;opacity:0.9}
+
+    .hearts{position:absolute;inset:auto 0 0 0;pointer-events:none;z-index:6}
+    .controls{display:flex;gap:10px;justify-content:center;margin-top:16px}
+    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.06);padding:10px 16px;border-radius:12px;color:#fff;cursor:pointer}
+    .btn:hover{transform:translateY(-3px)}
+
+    footer{position:absolute;left:12px;bottom:12px;font-size:12px;opacity:0.7}
+
+    /* small responsive tweaks */
+    @media (max-width:520px){.card{padding:20px;border-radius:16px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <canvas id="stars"></canvas>
+
+    <div class="card" role="main">
+      <h1>Thiên Hà Tình Yêu</h1>
+      <p class="lead">Gửi người thương — những vì sao băng, trái tim lấp lánh, và một lời nhắn từ vũ trụ.</p>
+
+      <div style="display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap">
+        <div style="min-width:220px;text-align:left">
+          <label style="display:block;font-size:13px;opacity:0.85;margin-bottom:6px">Tên người gửi</label>
+          <input id="from" placeholder="Tên bạn" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff" />
+        </div>
+        <div style="min-width:220px;text-align:left">
+          <label style="display:block;font-size:13px;opacity:0.85;margin-bottom:6px">Tên người nhận</label>
+          <input id="to" placeholder="Tên người ấy" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff" />
+        </div>
+      </div>
+
+      <textarea id="msg" placeholder="Viết lời nhắn..." style="width:100%;margin-top:14px;height:120px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff"></textarea>
+
+      <div class="controls">
+        <button class="btn" id="shoot">Bắn lời nhắn lên thiên hà ✨</button>
+        <button class="btn" id="toggleMusic">Phát nhạc</button>
+        <button class="btn" id="downloadImg">Tải ảnh</button>
+      </div>
+
+      <small style="display:block;margin-top:12px;opacity:0.8">Tip: điền tên + nhắn tin rồi bấm "Bắn lời nhắn" để tạo trái tim bay lên.</small>
+    </div>
+
+    <div class="hearts" id="hearts"></div>
+
+    <footer>Made with ♥ — Thiên Hà Tình Yêu</footer>
+
+    <!-- optional audio: to use your own, drop file at assets/music.mp3 and update src -->
+    <audio id="music" loop src="assets/music.mp3"></audio>
+  </div>
+
+  <script>
+    // STARFIELD
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = innerWidth;
+    let h = canvas.height = innerHeight;
+    const num = Math.round((w*h)/10000);
+    const stars = [];
+
+    function rand(min,max){return Math.random()*(max-min)+min}
+    function initStars(){stars.length=0;for(let i=0;i<num;i++){stars.push({x:Math.random()*w,y:Math.random()*h,z:rand(0.2,1),r:Math.random()*1.1})}}
+    function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight;initStars()}
+    addEventListener('resize',resize);
+    initStars();
+
+    function drawStars(){ctx.clearRect(0,0,w,h);for(const s of stars){const size=s.r*s.z*1.6;ctx.beginPath();ctx.fillStyle='rgba(255,255,255,'+ (0.6*s.z) +')';ctx.arc(s.x,s.y,size,0,Math.PI*2);ctx.fill();}}
+    function twinkle(){for(const s of stars){s.z += (Math.random()-0.5)*0.02; if(s.z<0.2) s.z=0.2; if(s.z>1) s.z=1}}
+    function animate(){drawStars();twinkle();requestAnimationFrame(animate)}
+    animate();
+
+    // HEARTS: create floating hearts that rise and fade
+    const heartsBox = document.getElementById('hearts');
+    function makeHeart(text){
+      const el = document.createElement('div');
+      el.innerText = text || '❤';
+      Object.assign(el.style,{position:'absolute',left: (50 + (Math.random()*40-20))+'%',transform:'translateX(-50%) scale(0.9)',bottom: '40px',fontSize: (18+Math.random()*24)+'px',opacity:1,pointerEvents:'none'});
+      heartsBox.appendChild(el);
+      const dur = 4000 + Math.random()*3000;
+      const xShift = (Math.random()*80-40);
+      el.animate([
+        {transform: `translateX(0) translateY(0) scale(0.8)`,opacity:1},
+        {transform: `translateX(${xShift}px) translateY(-${200+Math.random()*220}px) scale(1)`,opacity:0}
+      ],{duration:dur,easing:'cubic-bezier(.2,.9,.3,1)'});
+      setTimeout(()=>el.remove(),dur+50);
+    }
+
+    document.getElementById('shoot').addEventListener('click',()=>{
+      const from = document.getElementById('from').value.trim() || 'Gửi từ ai đó';
+      const to = document.getElementById('to').value.trim() || 'Người thương';
+      const msg = document.getElementById('msg').value.trim() || 'Một lời nhắn ngọt ngào từ thiên hà.';
+      // create multiple hearts with bits of text
+      const lines = [from,'💌', to, '—', msg];
+      for(let i=0;i<6;i++){
+        const t = lines[Math.floor(Math.random()*lines.length)];
+        setTimeout(()=>makeHeart(t), i*180);
+      }
+    });
+
+    // Music toggle
+    const music = document.getElementById('music');
+    const toggleMusic = document.getElementById('toggleMusic');
+    toggleMusic.addEventListener('click',()=>{
+      if(music.paused){ music.play().catch(()=>{}); toggleMusic.innerText='Tắt nhạc' } else { music.pause(); toggleMusic.innerText='Phát nhạc' }
+    });
+
+    // Download snapshot
+    document.getElementById('downloadImg').addEventListener('click',async()=>{
+      const scale = 2;
+      const imgCanvas = document.createElement('canvas');
+      imgCanvas.width = w*scale; imgCanvas.height = h*scale;
+      const imgCtx = imgCanvas.getContext('2d');
+      // draw star background
+      imgCtx.fillStyle = getComputedStyle(document.body).backgroundColor || '#05021a';
+      imgCtx.fillRect(0,0,imgCanvas.width,imgCanvas.height);
+      // draw current stars (approximation)
+      imgCtx.fillStyle='white';
+      for(const s of stars){imgCtx.globalAlpha = 0.5*s.z; imgCtx.beginPath(); imgCtx.arc(s.x*scale,s.y*scale, s.r*s.z*1.6*scale,0,Math.PI*2); imgCtx.fill() }
+      // render the card area using html2canvas would be ideal, but to keep single-file we will capture a simple message overlay
+      imgCtx.globalAlpha=1; imgCtx.fillStyle='rgba(0,0,0,0.35)'; imgCtx.fillRect(60*scale,60*scale, imgCanvas.width-120*scale, imgCanvas.height-140*scale);
+      imgCtx.fillStyle='white'; imgCtx.font = (36*scale)+'px sans-serif'; imgCtx.fillText('Thiên Hà Tình Yêu', 120*scale, 150*scale);
+
+      const url = imgCanvas.toDataURL('image/png');
+      const a = document.createElement('a'); a.href = url; a.download = 'thien-ha-tinh-yeu.png'; a.click();
+    });
+
+    // small accessibility: press Enter in inputs to shoot
+    ['from','to'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('shoot').click()}}));
+
+    // If user wants autoplay music on some browsers, note modern browsers often block autoplay with sound.
+
+  </script>
+</body>
+</html>
+
+<!-- ===================== assets/README ===================== -->
+<!--
+Place any optional assets in an `assets/` folder next to index.html.
+- assets/music.mp3  -> background music (use royalty-free audio)
+- assets/readme.txt -> notes
+
+Customize: change colors in :root, text, or swap the star generation logic.
+-->
